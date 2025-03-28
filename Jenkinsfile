@@ -1,32 +1,35 @@
 pipeline {
     agent any
-
-    stages {
+	environment{
+	// Define environment variables here
+	GIT_REPO_URL = 'https://github.com/DevuniDivya/mindcircuit15d.git'
+	GIT_BRANCH = 'main'
+	TOMACT_URL = 'http://ec2-54-197-10-71.compute-1.amazonaws.com:8081/'
+	CONTEXT_PATH = 'devops-app'
+	WAR_FILE_PATH = '**/*.war'
+	}
 	
-        stage('CLONE GITHUB CODE') {
+        stage('Clone git Repo') {
             steps {
-                echo 'In this stage code will be clone'
-				git branch: 'main', url: 'https://github.com/devopstraininghub/mindcircuit15d.git'
-				
-				}
+                echo 'Cloning code from Github Repo'
+				git branch: '${GIT_BRANCH}', url: '${GIT_REPO_URL}'
+			
+            }
         }
-		
-        stage('BUILDING THE CODE') {
+ 		
+           stage('Build Artifact') {
             steps {
-                echo 'In this stage code will be build and mvn artifact will be generated'
-				sh 'mvn clean install '
-				
-            }
-        }		
-		
-        stage('DEPLOY') {
+                echo 'Building Artifact using maven build tool'
+           sh 'mvn clean install'
+			}
+			
+        }
+   		
+            stage('Deploy to Tomcat') {
             steps {
-                echo 'In this stage .war artiface will be deployed on to tomcat '
-				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://54.91.227.106:8081/')], contextPath: 'devops-app', war: '**/*.war'
-				
+                echo 'Deploying Artifact on to Tomcat'
+				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: '${TOMCAT_URL}')], contextPath: '${CONTEXT_PATH}', war: '${WAR_FILE_PATH}'
             }
-        }		
-		
-		
+        }
     }
-}
+	
