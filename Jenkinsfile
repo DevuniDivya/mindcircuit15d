@@ -1,5 +1,7 @@
  pipeline {
     agent any
+
+	 
 	environment{
 	// Define environment variables here
 	GIT_REPO_URL = 'https://github.com/DevuniDivya/mindcircuit15d.git'
@@ -8,7 +10,13 @@
 	CONTEXT_PATH = 'devops-app'
 	WAR_FILE_PATH = '**/*.war'
 	}
-	
+
+	stages {
+	stage ('clean workspace'){
+	steps {
+	cleanWS()
+	}
+	}
         stage('CLONE GITHUB CODE') {
             steps {
                 echo 'In this stage clone will be cloned'
@@ -32,3 +40,4 @@
             }
         }
     }
+ }
