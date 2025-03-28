@@ -1,4 +1,4 @@
-pipeline {
+ pipeline {
     agent any
 	environment{
 	// Define environment variables here
@@ -9,27 +9,26 @@ pipeline {
 	WAR_FILE_PATH = '**/*.war'
 	}
 	
-        stage('Clone git Repo') {
+        stage('CLONE GITHUB CODE') {
             steps {
-                echo 'Cloning code from Github Repo'
+                echo 'In this stage clone will be cloned'
 				git branch: '${GIT_BRANCH}', url: '${GIT_REPO_URL}'
 			
             }
         }
  		
-           stage('Build Artifact') {
+           stage('BUILD THE CODE') {
             steps {
-                echo 'Building Artifact using maven build tool'
+                echo 'In this stage code will be built and mvn artifact will be generated'
            sh 'mvn clean install'
 			}
 			
         }
    		
-            stage('Deploy to Tomcat') {
+            stage('DEPLOY') {
             steps {
-                echo 'Deploying Artifact on to Tomcat'
+                echo 'In this stage .war artifact will bedeployed onto Tomcat'
 				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: '${TOMCAT_URL}')], contextPath: '${CONTEXT_PATH}', war: '${WAR_FILE_PATH}'
             }
         }
     }
-	
