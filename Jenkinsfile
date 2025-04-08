@@ -1,55 +1,31 @@
-pipeline {
+ 
+ pipeline {
     agent any
 
     stages { 
 	
-	  stage('Clean Workspace'){
-	      steps {
-	        cleanWS()
-	        }
-	         }
-	
-        
         stage('Clone git Repo') {
-		
             steps {
-			
-			script{
-			
-			try {
                 echo 'Cloning code from Github Repo'
 				git branch: 'main', url: 'https://github.com/DevuniDivya/mindcircuit15d.git'
-			}
-			catch (Exception e){
-			echo "stage 1 failed: ${e.message}"
-			}
+			
             }
         }
-        } 
+ 		
+           stage('Build Artifact') {
+            steps {
+                echo 'Building Artifact using maven build tool'
+           sh 'mvn clean install'
+			}
+			
+        }
    		
-            stage('Deploy to multiple environments') {
-			parallel {
-			    stage('Lab'){
-                steps {
-                echo 'Deploying on lab...'
-				}
-				}
-			stage('Sbox'){
+            stage('Deploy to Tomcat') {
             steps {
-                echo 'Running Maven package...'
-				}
-				}
-				stage('UAT'){
-            steps {
-                echo 'Running Maven install...'
-				}
-				}
-				stage('PROD'){
-            steps {
-                echo 'Running Maven install...'
-				}
-				}
+                echo 'Deploying Artifact on to Tomcat'
+				deploy adapters: [tomcat9(credentialsId: 'tomcat', path: '', url: 'http://54.227.0.85:8082/')], contextPath: 'divyaapp', war: '**/*.war'
             }
         }
     }
- }
+}
+
